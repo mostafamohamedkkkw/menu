@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منيو بورسيل ريستو</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#161616;--card:#222;--text:#fff;--muted:#aaa;--acc:#ffa500;--accT:#111;--line:#333;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161616;--card:#222;--text:#fff;--muted:#aaa;--line:#333}}
+:root[data-theme="dark"]{--bg:#161616;--card:#222;--text:#fff;--muted:#aaa;--line:#333}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',Tahoma,Arial,sans-serif;padding-bottom:110px;max-width:640px;margin:auto}
+header{text-align:center;padding:26px 16px 14px;background:linear-gradient(180deg,#2a1c00,var(--bg));border-bottom:2px solid var(--acc)}
+.logo{font-size:38px}h1{font-size:26px;font-weight:800;color:var(--acc)}
+header p{color:var(--muted);font-size:13px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding:10px 12px 6px}
+.bar input{width:100%;padding:12px 16px;border-radius:25px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;outline:none}
+.bar input:focus{border-color:var(--acc)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 18px;border-radius:20px;border:1px solid var(--acc);background:none;color:var(--acc);font:inherit;font-weight:600;cursor:pointer}
+.tab.on{background:var(--acc);color:var(--accT)}
+h2{margin:18px 14px 8px;font-size:19px;color:var(--acc);border-right:4px solid var(--acc);padding-right:10px}
+.item{display:flex;align-items:center;gap:12px;margin:8px 12px;padding:12px;background:var(--card);border-radius:14px}
+.ico{font-size:34px;width:54px;height:54px;display:grid;place-items:center;background:#2e2e2e;border-radius:50%}
+.info{flex:1}.name{font-weight:600}.price{color:var(--acc);font-weight:800}
+.add{background:var(--acc);color:var(--accT);border:0;border-radius:20px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:32px;height:32px;border-radius:50%;border:0;background:var(--acc);color:var(--accT);font-size:20px;font-weight:800;cursor:pointer;line-height:1}
+.qty b{min-width:18px;text-align:center}
+.empty{text-align:center;color:var(--muted);padding:40px}
+#fab{position:fixed;bottom:0;left:0;right:0;max-width:640px;margin:auto;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));z-index:10;display:none}
+#fab button{width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--acc);color:var(--accT);border:0;border-radius:16px;padding:14px 18px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 18px #000a}
+.sheet{position:fixed;inset:0;background:#000b;z-index:20;display:none;align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.panel{background:var(--bg);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ph h3{color:var(--acc)}.x{background:none;border:0;color:var(--text);font-size:26px;cursor:pointer}
+.line{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.total{display:flex;justify-content:space-between;font-size:18px;font-weight:800;padding:14px 0;color:var(--acc)}
+.mode{display:flex;gap:8px;margin:6px 0 12px}
+.mode button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--acc);background:none;color:var(--acc);font:inherit;font-weight:700;cursor:pointer}
+.mode button.on{background:var(--acc);color:var(--accT)}
+.panel input,.panel textarea{width:100%;margin-bottom:10px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;outline:none}
+.panel input:focus,.panel textarea:focus{border-color:var(--acc)}
+.send{width:100%;padding:14px;border:0;border-radius:14px;background:#25d366;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.err{color:#ff6b6b;font-size:13px;min-height:18px;margin-bottom:6px}
+</style>
+</head>
+<body>
+<header><div class="logo">🍴</div><h1>بورسيل ريستو</h1><p>قائمة الطعام – اختر وجبتك واطلب عبر واتساب</p></header>
+<div class="bar"><input id="q" type="search" placeholder="🔍 ابحث عن صنف..."><div class="tabs" id="tabs"></div></div>
+<main id="list"></main>
+<div id="fab"><button onclick="openCart()"><span id="fc">🛒 0 أصناف</span><span id="ft">0 $</span></button></div>
+<div class="sheet" id="sheet" onclick="if(event.target===this)closeCart()"><div class="panel">
+ <div class="ph"><h3>🛒 سلة المشتريات</h3><button class="x" onclick="closeCart()">×</button></div>
+ <div id="lines"></div>
+ <div class="total"><span>الإجمالي</span><span id="tot">0 $</span></div>
+ <div class="mode"><button id="m1" class="on" onclick="setMode('dine')">🍽️ داخل المطعم</button><button id="m2" onclick="setMode('delivery')">🛵 توصيل للمنزل</button></div>
+ <div id="dine"><input id="table" inputmode="numeric" placeholder="رقم الطاولة"></div>
+ <div id="deliv" style="display:none"><input id="cname" placeholder="الاسم"><input id="caddr" placeholder="العنوان بالتفصيل"><input id="cphone" inputmode="tel" placeholder="رقم الموبايل (اختياري)"></div>
+ <textarea id="notes" rows="2" placeholder="ملاحظات على الأكل (اختياري)"></textarea>
+ <div class="err" id="err"></div>
+ <button class="send" onclick="sendOrder()">إرسال الطلب عبر واتساب</button>
+</div></div>
+<script>
+const SHEET_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vS4H-8-xp-wbSyvmRkZYyietQ9sRfetX-vDFfWJRn6fCt-Nk-o0rEEpL3W11Ra-fgKACM-a25DcqhY-/pub?output=csv", // ضع هنا رابط Google Sheet المنشور بصيغة CSV
+CASHIER="01205012277", COUNTRY="20", CUR="$", RESTO="بورسيل ريستو";
+const OLD=[
+ {id:"pasta",n:"باستا",e:"🍝",items:[["باستا سبيشيال",2],["باستا صغيرة",3],["باستا وسط",4],["باستا كبيرة",5],["باستا سبايسي",6]]},
+ {id:"burger",n:"برجر",e:"🍔",items:[["برجر سبايسي",2],["برجر صغير",3],["برجر وسط",4],["برجر كبير",5],["برجر طماطم",6]]},
+ {id:"pizza",n:"بيتزا",e:"🍕",items:[["بيتزا سبيشيال",2],["بيتزا صغيرة",3],["بيتزا وسط",4],["بيتزا كبيرة",5],["بيتزا سبايسي",6]]},
+ {id:"other",n:"أصناف أخرى",e:"🍽️",items:Array.from({length:12},(_,i)=>["صنف "+(i+1),2+i%4])}
+];
+const DEFAULT_ROWS=[];OLD.forEach(c=>c.items.forEach(it=>DEFAULT_ROWS.push([c.n,it[0],it[1],c.e])));
+let CATS=[],ITEMS=[];
+const ICONS={"باستا":"🍝","برجر":"🍔","بيتزا":"🍕"};
+function parseCSV(t){const rows=[];let r=[],f="",q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=ch}else if(ch=='"')q=true;else if(ch==","){r.push(f);f=""}else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(f);f="";rows.push(r);r=[]}else f+=ch}if(f||r.length){r.push(f);rows.push(r)}return rows}
+function build(rows){CATS=[];ITEMS=[];const map={};rows.forEach(r=>{const c=String(r[0]||"").trim(),n=String(r[1]||"").trim(),p=parseFloat(String(r[2]||"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d.]/g,""));if(!c||!n||isNaN(p))return;if(!map[c]){map[c]={id:"c"+CATS.length,n:c,e:String(r[3]||"").trim()||ICONS[c]||"🍽️"};CATS.push(map[c])}const cc=map[c];ITEMS.push({id:cc.id+"_"+ITEMS.length,cat:cc.id,e:cc.e,name:n,price:p})})}
+async function init(){
+ $("list").innerHTML='<div class="empty">جاري تحميل المنيو...</div>';
+ let rows=null;
+ if(SHEET_URL){try{const r=await fetch(SHEET_URL+(SHEET_URL.includes("?")?"&":"?")+"t="+Date.now());if(!r.ok)throw 0;const t=await r.text();rows=parseCSV(t);try{localStorage.setItem("menu_csv",t)}catch(e){}}catch(e){try{const t=localStorage.getItem("menu_csv");if(t)rows=parseCSV(t)}catch(e2){}}}
+ if(rows)build(rows);
+ if(!ITEMS.length)build(DEFAULT_ROWS);
+ tabs();render()}
+let cart={},cat="all",mode="dine";
+const $=id=>document.getElementById(id);
+const fmt=n=>n+" "+CUR;
+function tabs(){$("tabs").innerHTML=[{id:"all",n:"الكل"},...CATS].map(c=>`<button class="tab ${cat===c.id?"on":""}" onclick="cat='${c.id}';tabs();render()">${c.n}</button>`).join("")}
+function ctrl(id){const q=cart[id]||0;return q?`<div class="qty"><button onclick="chg('${id}',1)">+</button><b>${q}</b><button onclick="chg('${id}',-1)">−</button></div>`:`<button class="add" onclick="chg('${id}',1)">+ إضافة للسلة</button>`}
+function render(){
+ const s=$("q").value.trim();let out="",n=0;
+ CATS.forEach(c=>{if(cat!=="all"&&cat!==c.id)return;
+  const its=ITEMS.filter(i=>i.cat===c.id&&i.name.includes(s));if(!its.length)return;n+=its.length;
+  out+=`<h2>${c.e} ${c.n}</h2>`+its.map(i=>`<div class="item"><div class="ico">${i.e}</div><div class="info"><div class="name">${i.name}</div><div class="price">${fmt(i.price)}</div></div><div id="c_${i.id}">${ctrl(i.id)}</div></div>`).join("")});
+ $("list").innerHTML=out||'<div class="empty">لا توجد نتائج مطابقة 🔎</div>';
+}
+function chg(id,d){cart[id]=Math.max(0,(cart[id]||0)+d);if(!cart[id])delete cart[id];const e=$("c_"+id);if(e)e.innerHTML=ctrl(id);upd();if($("sheet").classList.contains("show"))lines()}
+function totals(){let c=0,t=0;for(const id in cart){const it=ITEMS.find(i=>i.id===id);c+=cart[id];t+=cart[id]*it.price}return{c,t}}
+function upd(){const{c,t}=totals();$("fab").style.display=c?"block":"none";$("fc").textContent="🛒 "+c+(c===1?" صنف":" أصناف");$("ft").textContent=fmt(t)}
+function lines(){
+ const{c,t}=totals();if(!c){closeCart();return}
+ $("lines").innerHTML=Object.keys(cart).map(id=>{const it=ITEMS.find(i=>i.id===id);return`<div class="line"><div><div class="name">${it.name}</div><div class="price">${fmt(it.price*cart[id])}</div></div><div class="qty"><button onclick="chg('${id}',1)">+</button><b>${cart[id]}</b><button onclick="chg('${id}',-1)">−</button></div></div>`}).join("");
+ $("tot").textContent=fmt(t)}
+function openCart(){lines();$("err").textContent="";$("sheet").classList.add("show")}
+function closeCart(){$("sheet").classList.remove("show")}
+function setMode(m){mode=m;$("m1").classList.toggle("on",m==="dine");$("m2").classList.toggle("on",m==="delivery");$("dine").style.display=m==="dine"?"block":"none";$("deliv").style.display=m==="delivery"?"block":"none"}
+function sendOrder(){
+ const{c,t}=totals();if(!c)return;
+ const table=$("table").value.trim(),nm=$("cname").value.trim(),ad=$("caddr").value.trim(),ph=$("cphone").value.trim(),nt=$("notes").value.trim();
+ if(mode==="dine"&&!table){$("err").textContent="من فضلك اكتب رقم الطاولة";return}
+ if(mode==="delivery"&&(!nm||!ad)){$("err").textContent="من فضلك اكتب الاسم والعنوان";return}
+ const d=new Date(),no=String(d.getTime()).slice(-6);
+ let m=`🧾 *فاتورة طلب جديد – ${RESTO}*\n`;
+ m+=`رقم الطلب: #${no}\nالتاريخ: ${d.toLocaleDateString("ar-EG")} ${d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})}\n━━━━━━━━━━━━━━\n`;
+ m+=mode==="dine"?`🍽️ *داخل المطعم*\n🪑 رقم الطاولة: ${table}\n`:`🛵 *توصيل للمنزل*\n👤 الاسم: ${nm}\n📍 العنوان: ${ad}\n${ph?"📞 الموبايل: "+ph+"\n":""}`;
+ m+=`━━━━━━━━━━━━━━\n*الطلبات:*\n`;
+ Object.keys(cart).forEach((id,i)=>{const it=ITEMS.find(x=>x.id===id);m+=`${i+1}. ${it.name}  ×${cart[id]}  =  ${it.price*cart[id]} ${CUR}\n`});
+ m+=`━━━━━━━━━━━━━━\n📦 عدد الأصناف: ${c}\n💰 *الإجمالي: ${t} ${CUR}*\n`;
+ if(nt)m+=`📝 ملاحظات: ${nt}\n`;
+ const num=COUNTRY+CASHIER.replace(/^0+/,"");
+ window.open("https://wa.me/"+num+"?text="+encodeURIComponent(m),"_blank");
+}
+$("q").addEventListener("input",render);
+init();
+</script>
+</body>
+</html>
